@@ -1,0 +1,82 @@
+- name: Deploy MediaWiki with MySQL on Kubernetes
+  hosts: localhost
+  gather_facts: no
+
+  tasks:
+    - name: Create ConfigMap
+      k8s:
+        state: present
+        src: LocalSettings.php
+        namespace: default
+        kind: ConfigMap
+        name: mediawiki-config
+
+    - name: Create Secret
+      k8s:
+        state: present
+        namespace: default
+        kind: Secret
+        name: mysql-secret
+        type: Opaque
+        data:
+          password: "{{ mysql_root_password | b64encode }}"
+
+    - name: Create Deployment
+      k8s:
+        state: present
+        namespace: default
+        definition:
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: mediawiki
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: mediawiki
+            template:
+              metadata:
+                labels:
+                  app: mediawiki
+              spec:
+                containers:
+                  - name: mediawiki
+                    image: <registry>/mediawiki:latest
+                    ports:
+                      - containerPort: 80
+                    env:
+                      - name: MYSQL_ROOT_PASSWORD
+                        valueFrom:
+                          secretKeyRef:
+                            name: mysql-secret
+                            key: password
+                    volumeMounts:
+                      - name: config
+                        mountPath: /var/www/html/LocalSettings.php
+                        subPath: LocalSettings.php
+                volumes:
+                  - name: config
+                    configMap:
+                      name: mediawiki-config
+                      items:
+                        - key: LocalSettings.php
+                          path: LocalSettings.php
+
+    - name: Create Service
+      k8s:
+        state: present
+        namespace: default
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: mediawiki
+          spec:
+            selector:
+              app: mediawiki
+            ports:
+              - name: http
+                port: 80
+                targetPort: 80
+
