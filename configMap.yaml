@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mediawiki-configmap
+data:
+  LocalSettings.php: |
+    $wgSitename = "My Wiki";
+    $wgMetaNamespace = "MyWiki";
+    $wgScriptPath = "/wiki";
+    $wgDBtype = "mysql";
+    $wgDBserver = "sql";
+    $wgDBname = "my_wiki";
+    $wgDBuser = "user";
+    $wgDBpassword = "password";
+

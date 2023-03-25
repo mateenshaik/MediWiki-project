@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mediawiki
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mediawiki
+  template:
+    metadata:
+      labels:
+        app: mediawiki
+    spec:
+      containers:
+      - name: mediawiki
+        image: mateenshaikh00/mediawiki:V10
+        env:
+        - name: DB_HOST
+          value: sql
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: sql-secret
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: sql-secret
+              key: password
+        ports:
+        - containerPort: 80
+        volumeMounts:  
+        - name: mediawiki-persistent-storage
+          mountPath: /var/www/html/images
+      volumes:       
+        - name: mediawiki-persistent-storage
+          persistentVolumeClaim:
+           claimName: mediawiki-pvc
+
+           
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mediawiki-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: mediawiki
+  ports:
+    - name: mediawiki
+      protocol: TCP
+      port: 8082
+      targetPort: 80
+      nodePort: 30007
+
