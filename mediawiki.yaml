@@ -16,17 +16,17 @@ spec:
       - name: mediawiki
         image: mateenshaikh00/mediawiki:V10
         env:
-        - name: DB_HOST
-          value: sql
-        - name: DB_USER
-          valueFrom:
-            secretKeyRef:
-              name: sql-secret
-              key: username
+        #- name: DB_HOST
+        #  value: sql
+        #- name: DB_USER
+        # valueFrom:
+        #   secretKeyRef:
+        #     name: mysql-secret
+        #     key: username
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: sql-secret
+              name: mysql-secret
               key: password
         ports:
         - containerPort: 80
