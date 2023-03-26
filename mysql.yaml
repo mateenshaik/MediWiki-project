@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: mysql
-        image: mysql
+        image: mysql:latest
         env:
 
           - name: MYSQL_ROOT_PASSWORD
@@ -45,4 +45,5 @@ spec:
   ports:
     - name: mysql
       port: 3306
+      targetPort: 3306
 

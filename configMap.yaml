@@ -8,7 +8,7 @@ data:
     $wgMetaNamespace = "MyWiki";
     $wgScriptPath = "/wiki";
     $wgDBtype = "mysql";
-    $wgDBserver = "sql";
+    $wgDBserver = "localhost";
     $wgDBname = "my_wiki";
     $wgDBuser = "user";
     $wgDBpassword = "password";
